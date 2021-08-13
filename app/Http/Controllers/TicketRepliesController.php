@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Validator;
 class TicketRepliesController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['only' => ['addReply']]);
+    }
+
     public function addReply(Request $request, $id)
     {
         try {
@@ -20,25 +25,28 @@ class TicketRepliesController extends Controller
                 $error = $validator->getMessageBag()->getMessages();
                 return response()->json([
                     'success' => false,
-                     'Error' => $error
-                    ]);
+                    'Error' => $error
+                ]);
             }
+            //Create a reply to ticket and send a success message 
             $reply = new TicketReplies;
             $reply->ticket_id = $id;
             $reply->content = $request->input('content');
 
             $reply->save();
-            return response()->json(array(
-                'success' => true,
-                'message' => 'Reply added ',
-                'created_reply' => $reply),
-                 200
-                );
+            return response()->json(
+                array(
+                    'success' => true,
+                    'message' => 'Reply added ',
+                    'created_reply' => $reply
+                ),
+                200
+            );
         } catch (\Exception $exception) {
-                return response([
-                'success' => false, 
+            return response([
+                'success' => false,
                 'message' => $exception->getMessage()
-                ]);
+            ]);
         }
     }
 }

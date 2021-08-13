@@ -11,7 +11,7 @@ class TicketController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['only' => ['update', 'store']]);
+        $this->middleware('auth:api', ['only' => ['update', 'store', 'updateStatus']]);
     }
 
 
@@ -34,6 +34,8 @@ class TicketController extends Controller
         }
 
         try {
+            //Create a ticket and send a success message 
+
             $ticket = new Ticket;
             $ticket->category = $request->input('category');
             $ticket->subject = $request->input('subject');
@@ -43,10 +45,18 @@ class TicketController extends Controller
 
             $ticket->save();
 
-            return response()->json(array('success' => true, 'message' => 'Ticket added', 'created_ticket' => $ticket), 200);
+            return response()->json(
+                array(
+                    'success' => true,
+                    'message' => 'Ticket added',
+                    'created_ticket' => $ticket
+                ),
+                200
+            );
         } catch (\Exception $exception) {
             return response([
-                'success' => false, 'message' => $exception->getMessage()
+                'success' => false,
+                'message' => $exception->getMessage()
             ]);
         }
     }
@@ -72,20 +82,22 @@ class TicketController extends Controller
             if ($validator->fails()) {
                 $error = $validator->getMessageBag()->getMessages();
                 return response()->json([
-                    'success' => false, 
-                    'Error' => $error]);
+                    'success' => false,
+                    'Error' => $error
+                ]);
             }
 
-
+            //update the ticket and send a success message 
             $ticket->category = $request->input('category');
             $ticket->subject = $request->input('subject');
             $ticket->description = $request->input('description');
             $ticket->save();
-            return response()->json(array(
-                'success' => true, 
-                'message' => 'Ticket updated',
-                'updated_ticket' => $ticket),
-                 200
+            return response()->json(
+                array(
+                    'success' => true,
+                    'message' => 'Ticket updated',
+                    'updated_ticket' => $ticket
+                ),200
             );
         } catch (\Exception $exception) {
             return response([
@@ -94,7 +106,7 @@ class TicketController extends Controller
             ]);
         }
     }
-
+    //change the ticket status to Declined or resolved 
     public function updateStatus(Request $request, $id)
     {
         try {
@@ -105,27 +117,28 @@ class TicketController extends Controller
                 $error = $validator->getMessageBag()->getMessages();
                 return response()->json([
                     'success' => false,
-                     'Error' => $error
-                    ]);
+                    'Error' => $error
+                ]);
             }
             if ($request->input('status') != 'resolved' and $request->input('status') != 'declined') {
                 return response()->json([
                     'success' => false,
-                     'message' => 'status must be resolved or declined'
-                    ]);
+                    'message' => 'status must be resolved or declined'
+                ]);
             }
             $ticket = Ticket::find($id);
             $ticket->status = $request->input('status');
             $ticket->save();
-            return response()->json(array(
-                'success' => true, 
-                'message' => 'Status Ticket updated', 
-                'updated_ticket' => $ticket),
-                 200
-                );
+            return response()->json(
+                array(
+                    'success' => true,
+                    'message' => 'Status Ticket updated',
+                    'updated_ticket' => $ticket
+                ),200
+            );
         } catch (\Exception $exception) {
             return response([
-                'success' => false, 
+                'success' => false,
                 'message' => $exception->getMessage()
             ]);
         }

@@ -10,8 +10,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Ticket extends Model
 {
     use HasFactory;
-    protected $fillable = ['category', 'subject', 'decsription', 'user_id'];
+    protected $fillable = ['category', 'subject', 'decsription', 'user_id','status'];
+    
 
+    //Create a One-To-Many Relationship 
     public function User()
     {
         return $this->belongsTo('App\Models\User');

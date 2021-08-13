@@ -10,6 +10,7 @@ class TicketReplies extends Model
     use HasFactory;
     protected $fillable = ['ticket_id', 'content'];
 
+    //Create a One-To-Many Relationship 
     public function ticket()
     {
         return $this->belongsTo('App\Models\Ticket');

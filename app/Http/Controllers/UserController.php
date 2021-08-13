@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Mail\Message;
 
 class UserController extends Controller
 {
@@ -23,23 +24,26 @@ class UserController extends Controller
             'password' => ['required'],
         ]);
 
+        //Check if email exists in database
         $user = User::where('email', $request->email)->first();
         if ($user) {
             return [
-                "success" => false, 
+                "success" => false,
                 "message" => "user exists"
             ];
         }
 
 
-
-        /*  Mail::send('emails.welcome', ['username'=>$request->nusername,'Email'=>$request->email], function (Message $message) use ($request) {
+        // Send a welcome email after user registration
+        Mail::send('emails.welcome', ['username' => $request->username], function (Message $message) use ($request) {
             $message->to($request->email);
             $message->subject('Welcome To Support Tickets');
         });
-       if (count(Mail::failures()) > 0) {
-            return ['success'=>false,'message'=>'Mail does not exist'];
-           }*/
+        if (count(Mail::failures()) > 0) {
+            return ['success' => false, 'message' => 'Mail does not exist'];
+        }
+
+        //Create a new user
         try {
 
 
@@ -54,13 +58,13 @@ class UserController extends Controller
 
 
             return [
-                "success" => true, 
-                 'message' => 'user added'
+                "success" => true,
+                'message' => 'user added'
             ];
         } catch (\Exception $exception) {
             return response([
                 'success' => false,
-                 'message' => $exception->getMessage()
+                'message' => $exception->getMessage()
             ]);
         }
     }
@@ -73,21 +77,24 @@ class UserController extends Controller
                 'email' => ['required', 'email'],
                 'password' => ['required']
             ]);
-
+            // Validate email and password to check if it is the same as in database
             $user = User::where('email', $request->email)->first();
+
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return [
-                    "success" => false, 
+                    "success" => false,
                     'message' => 'authentification error'
-                    ];
+                ];
             }
+
+            //Create an access token manually to authenticate users using Passport
             return [
-                "success" => true, 
+                "success" => true,
                 "token" => $user->createToken('Auth-token')->accessToken
-                  ];
+            ];
         } catch (\Exception $exception) {
             return response([
-                'success' => false, 
+                'success' => false,
                 'message' => $exception->getMessage()
             ]);
         }
