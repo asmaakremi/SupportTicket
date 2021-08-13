@@ -7,9 +7,12 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 ## Requirements
+
 PHP version 7.3+ is recommended
 MySQL database 
+
 ## Recommendations
+
 gd, gettext, json, and mbstring extensions for PHP
 
 ## About Laravel
